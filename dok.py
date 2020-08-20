@@ -15,12 +15,11 @@ class Prin(object):
     print ("Hello " + a.x);
 
   def New2(a,b):
-    print("the b is " + b)
-    str1 = b
-    t1 = subprocess.run(b, capture_output=True, shell=True)
-    print(t1.returncode)
+    t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
+    print("stdout is" + "\n" + t1.stdout)
+    print("returncode is" + str(t1.returncode))
     if ( t1.returncode == 0 ):
-      print ("the output is successful :" + str(t1))
+      print ("the output is successful :" )
     else:
       print ("the command failed :" + str(t1))
 
