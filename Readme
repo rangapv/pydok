@@ -1,1 +1,2 @@
 Python script to Display Docker characteristics and Visualization
+For Python version 3.5 use subprocess with PIPE for Python version 3.6 and above you can ignore PIPE and use capture_output.
