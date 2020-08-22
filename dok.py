@@ -39,6 +39,21 @@ class Prin(object):
       else:
         print ("Image with ID:"+  r[2] + "is a PARENT") 
 
+
+  def Imageid(a):
+    t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
+    l = []
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      l.append(r[2])
+    return(l)
+
+
+  def Dangle(a):
+    l = y.Imageid()
+    for i in l:
+      print("The imageID is : {}".format(i)) 
+
   def New3(a,b):
     t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
     t2 = io.TextIOWrapper(t1)
@@ -63,8 +78,10 @@ if __name__ == '__main__':
   if ( len1 > 1):
     if (sys.argv[1] == "-a" ):
       y.Ancestor("docker image ls")
+    elif (sys.argv[1] == "-d" ):
+      y.Dangle()
     else:
       print("No command line")
   else:
-    print("No COmamnd line")
+    print("No comamnd line")
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
