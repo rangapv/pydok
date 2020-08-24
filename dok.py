@@ -48,11 +48,52 @@ class Prin(object):
       l.append(r[2])
     return(l)
 
+  def ImageRepo(a):
+    t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
+    l = [] 
+    t = ()
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      t = (r[2],r[0]) 
+      l.append(t)
+    return(l)
+
+
+  def Containerid(a):
+    t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+    l = []
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      l.append(t)
+    return(l)
+
+  def ContainerCheck(a,x):
+    count = 0
+    t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      r1 = re.search(x[0],r[1])
+      r2 = re.search(x[1],r[1])
+      if (r1 or r2):
+        print("the match is")
+        print(x[0])
+        print(r[1])
+        print(r[2])
+        print(r1)
+        print(r2)
+        ++count
+    if (count == 0):
+      print("The iamge with ID: {}".format(x[0]) + "is dangling")
 
   def Dangle(a):
     l = y.Imageid()
     for i in l:
       print("The imageID is : {}".format(i)) 
+
+    l = y.ImageRepo()
+    print(l)
+    for x in l:
+      y.ContainerCheck(x)
 
   def New3(a,b):
     t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
