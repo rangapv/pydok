@@ -33,7 +33,6 @@ class Prin(object):
       r = re.findall(r'\S+',line) 
       ki = "1ebbaebd9704"
       pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=False)
-      print(len(pa.stdout)) 
       if (len(pa.stdout) > 1 ):
         print ("Image with ID:"+  r[2] + "is a CHILD")
       else:
@@ -72,26 +71,22 @@ class Prin(object):
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line)
-      r1 = re.search(x[0],r[1])
-      r2 = re.search(x[1],r[1])
+      r1 = re.search(r[1],x[0])
+      r2 = re.search(r[1],x[1])
       if (r1 or r2):
-        print("the match is")
-        print(x[0])
-        print(r[1])
-        print(r[2])
-        print(r1)
-        print(r2)
-        ++count
+       count = count + 1
     if (count == 0):
-      print("The iamge with ID: {}".format(x[0]) + "is dangling")
+      print("The iamge with ID: {}".format(x[0]) +  "is dangling")
+    else:
+      print("The iamge with ID: {}".format(x[0]) + " is in use")
+
 
   def Dangle(a):
-    l = y.Imageid()
-    for i in l:
-      print("The imageID is : {}".format(i)) 
+    li = y.Imageid()
+#    for i in l:
+#      print("The imageID is : {}".format(i)) 
 
     l = y.ImageRepo()
-    print(l)
     for x in l:
       y.ContainerCheck(x)
 
@@ -107,13 +102,12 @@ class Prin(object):
 
 if __name__ == '__main__':
   y = Prin()
-  y.New2("docker image ls")
+#  y.New2("docker image ls")
  
 # Get the Conatiner output
-  y.New2("docker container ls")  
+#  y.New2("docker container ls")  
 
   len1 = len(sys.argv)
-  print("the length is" + str(len1))
 
 
   if ( len1 > 1):
