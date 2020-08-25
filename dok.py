@@ -79,7 +79,7 @@ class Prin(object):
       print("The iamge with ID: {}".format(x[0]) +  "is dangling")
     else:
       print("The iamge with ID: {}".format(x[0]) + " is in use")
-
+    return(count)
 
   def Dangle(a):
     li = y.Imageid()
@@ -87,9 +87,16 @@ class Prin(object):
 #      print("The imageID is : {}".format(i)) 
 
     l = y.ImageRepo()
+    di = 0
+    si = 0
     for x in l:
-      y.ContainerCheck(x)
-
+      cc = y.ContainerCheck(x)
+      if (cc == 0):
+        di = di + 1
+      else:
+        si = si + 1
+    print("The totat Dangling Image count is {} ".format(di))
+    print("The total Iamge in use by container is {} ".format(si))
   def New3(a,b):
     t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
     t2 = io.TextIOWrapper(t1)
