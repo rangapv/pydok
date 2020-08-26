@@ -35,7 +35,6 @@ class Prin(object):
     pc = 0
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line) 
-      ki = "1ebbaebd9704"
       pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=False)
       if (len(pa.stdout) > 1 ):
         print ("Image with ID:"+  r[2] + "is a CHILD")
@@ -46,6 +45,34 @@ class Prin(object):
         pl.append(r[2])
         pc = pc + 1 
     return(cl,pl,cc,pc)
+
+  def ImageArray(a):
+    b = "docker image ls"
+    icl,ipl,icc,ipc = y.Ancestor(b)
+    count = 0
+    for x in icl:
+      c = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(x)
+      t1 = subprocess.run(c, capture_output=True, shell=True, text=True, check=True)
+    #  for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+', t1.stdout)
+      for iy in r:
+          l1 = subprocess.Popen(["echo {} | sed -e 's/\[//g; s/\]//g'".format(iy)], shell=True, text=True, stdout=PIPE, stderr=PIPE)
+          l2,l3 = l1.communicate()
+          for ip in ipl:
+              pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)  
+              pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
+              l11 = subprocess.Popen(["echo {} | sed -e 's/\[//g; s/\]//g'".format(pl.stdout)], shell=True, text=True, stdout=PIPE, stderr=PIPE)
+              l21,l31 = l11.communicate()
+              l24 = l21.replace("[","")
+              l25 = l24.replace("]","")
+              s = re.findall(r'\S+', l25)
+              for g in s:
+                g1 = l2.find(g) 
+                if (g1 != -1): 
+                  print("The image child id: {}".format(x))
+                  print("Is having a Gaurdian :{}".format(ip))
+                  count = count + 1
+    print("Total found parent is {}".format(count))      
 
   def Imageid(a):
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
@@ -132,6 +159,8 @@ if __name__ == '__main__':
       print("The total Parent Image count is {}".format(phc))
     elif (sys.argv[1] == "-d" ):
       y.Dangle()
+    elif (sys.argv[1] == "-p" ):
+      y.ImageArray()
     else:
       print("No command line")
   else:
