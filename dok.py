@@ -29,15 +29,23 @@ class Prin(object):
 
   def Ancestor(a,b):
     t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
+    cl = []
+    pl = []
+    cc = 0
+    pc = 0
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line) 
       ki = "1ebbaebd9704"
       pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=False)
       if (len(pa.stdout) > 1 ):
         print ("Image with ID:"+  r[2] + "is a CHILD")
+        cl.append(r[2])
+        cc = cc + 1
       else:
-        print ("Image with ID:"+  r[2] + "is a PARENT") 
-
+        print ("Image with ID:"+  r[2] + "is a PARENT")
+        pl.append(r[2])
+        pc = pc + 1 
+    return(cl,pl,cc,pc)
 
   def Imageid(a):
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
@@ -119,7 +127,9 @@ if __name__ == '__main__':
 
   if ( len1 > 1):
     if (sys.argv[1] == "-a" ):
-      y.Ancestor("docker image ls")
+      mcl,mpl,chc,phc = y.Ancestor("docker image ls")
+      print("The total Child Image count is {}".format(chc))
+      print("The total Parent Image count is {}".format(phc))
     elif (sys.argv[1] == "-d" ):
       y.Dangle()
     else:
