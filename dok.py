@@ -50,15 +50,23 @@ class Prin(object):
     b = "docker image ls"
     icl,ipl,icc,ipc = y.Ancestor(b)
     count = 0
+    print(icl)
+    icl = list(dict.fromkeys(icl))
+    print(icl)
+    print(ipl)
     for x in icl:
       c = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(x)
       t1 = subprocess.run(c, capture_output=True, shell=True, text=True, check=True)
     #  for line in t1.stdout.splitlines():
       r = re.findall(r'\S+', t1.stdout)
+      cv = 0
       for iy in r:
+          if (cv > 0):
+            break
           l1 = subprocess.Popen(["echo {} | sed -e 's/\[//g; s/\]//g'".format(iy)], shell=True, text=True, stdout=PIPE, stderr=PIPE)
           l2,l3 = l1.communicate()
           for ip in ipl:
+             # print("The child id is: {} and the Parent id is {}".format(x,ip))
               pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)  
               pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
               l11 = subprocess.Popen(["echo {} | sed -e 's/\[//g; s/\]//g'".format(pl.stdout)], shell=True, text=True, stdout=PIPE, stderr=PIPE)
@@ -72,6 +80,7 @@ class Prin(object):
                   print("The image child id: {}".format(x))
                   print("Is having a Gaurdian :{}".format(ip))
                   count = count + 1
+                  cv = 1  
     print("Total found parent is {}".format(count))      
 
   def Imageid(a):
