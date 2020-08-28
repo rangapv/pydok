@@ -77,8 +77,7 @@ class Prin(object):
               for g in s:
                 g1 = l2.find(g) 
                 if (g1 != -1): 
-                  print("The image child id: {}".format(x))
-                  print("Is having a Gaurdian :{}".format(ip))
+                  print("The image child id: {} is having Guardian: {}".format(x,ip))
                   count = count + 1
                   cv = 1  
     print("Total found parent is {}".format(count))      
@@ -101,6 +100,22 @@ class Prin(object):
       l.append(t)
     return(l)
 
+  def Findsha(a,sh):
+    scount = 0
+    id = y.Imageid()
+    for ip in id:
+      pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)
+      pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
+      l21 = pl.stdout
+      l24 = l21.replace("[","")
+      l25 = l24.replace("]","")
+      s = re.findall(r'\S+', l25)
+      for g in s:
+        g1 = sh.find(g)
+        if (g1 != -1):
+          print("The sha id: {} is having Guardian: {}".format(sh,ip))
+          scount = scount + 1
+    print("Total Count:" + str(scount))  
 
   def Containerid(a):
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
@@ -170,8 +185,11 @@ if __name__ == '__main__':
       y.Dangle()
     elif (sys.argv[1] == "-p" ):
       y.ImageArray()
+    elif (sys.argv[1] == "-f" ):
+      sh = sys.argv[2]
+      y.Findsha(sh)
     else:
-      print("No command line")
+      print("Allowed options are -a/-d/-p")
   else:
     print("No comamnd line")
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
