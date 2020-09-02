@@ -6,6 +6,7 @@ import sys
 
 import io
 import re
+import argparse
 
 from subprocess import PIPE
 
@@ -14,6 +15,7 @@ class Prin(object):
   def __init__(self):
     self.x = "Docker";
   
+
   def New1(a):
     print ("Hello " + a.x);
 
@@ -125,6 +127,14 @@ class Prin(object):
       l.append(t)
     return(l)
 
+  def Containerid1(a,string):
+    t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+    l = []
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      l.append(r[0])
+    return(l)
+
   def ContainerCheck(a,x):
     count = 0
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
@@ -140,11 +150,23 @@ class Prin(object):
       print("The iamge with ID: {}".format(x[0]) + " is in use")
     return(count)
 
+  def Dangle1(a,string):
+#    t5 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+#    print(t5.stdout)  
+    #parser.values.saw_foo = True
+    value = int(string)
+
+    t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+    l = []
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      l.append(r[0])
+    return(l)
+
+ 
   def Dangle(a):
     li = y.Imageid()
-#    for i in l:
-#      print("The imageID is : {}".format(i)) 
-
+   
     l = y.ImageRepo()
     di = 0
     si = 0
@@ -173,6 +195,11 @@ if __name__ == '__main__':
 # Get the Conatiner output
 #  y.New2("docker container ls")  
 
+  parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
+  parser.add_argument('-id', type=y.Dangle1) 
+  parser.add_argument('-cid', type=y.Containerid1)
+  args = parser.parse_args()
+  print(args)
   len1 = len(sys.argv)
 
 
@@ -186,10 +213,13 @@ if __name__ == '__main__':
     elif (sys.argv[1] == "-p" ):
       y.ImageArray()
     elif (sys.argv[1] == "-f" ):
-      sh = sys.argv[2]
-      y.Findsha(sh)
+      if (sys.argv[2]):
+        sh = sys.argv[2]
+        y.Findsha(sh)
+      else:
+        print("need an sha256 string")
     else:
-      print("Allowed options are -a/-d/-p")
+      print("Allowed options are -a/-d/-p/-f")
   else:
     print("No comamnd line")
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
