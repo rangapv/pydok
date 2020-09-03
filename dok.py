@@ -48,7 +48,7 @@ class Prin(object):
         pc = pc + 1 
     return(cl,pl,cc,pc)
 
-  def ImageArray(a):
+  def ImageArray(a,string):
     b = "docker image ls"
     icl,ipl,icc,ipc = y.Ancestor(b)
     count = 0
@@ -151,9 +151,6 @@ class Prin(object):
     return(count)
 
   def Dangle1(a,string):
-#    t5 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
-#    print(t5.stdout)  
-    #parser.values.saw_foo = True
     value = int(string)
 
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
@@ -164,7 +161,7 @@ class Prin(object):
     return(l)
 
  
-  def Dangle(a):
+  def Dangle(a,string):
     li = y.Imageid()
    
     l = y.ImageRepo()
@@ -178,6 +175,7 @@ class Prin(object):
         si = si + 1
     print("The totat Dangling Image count is {} ".format(di))
     print("The total Iamge in use by container is {} ".format(si))
+
   def New3(a,b):
     t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
     t2 = io.TextIOWrapper(t1)
@@ -190,36 +188,15 @@ class Prin(object):
 
 if __name__ == '__main__':
   y = Prin()
-#  y.New2("docker image ls")
- 
-# Get the Conatiner output
-#  y.New2("docker container ls")  
 
   parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
   parser.add_argument('-id', type=y.Dangle1) 
   parser.add_argument('-cid', type=y.Containerid1)
+  parser.add_argument('-d', type=y.Dangle)
+  parser.add_argument('-p', type=y.ImageArray)
+  parser.add_argument('-a', type=y.Ancestor)
+  parser.add_argument('-f', type=y.Findsha)
   args = parser.parse_args()
   print(args)
-  len1 = len(sys.argv)
 
-
-  if ( len1 > 1):
-    if (sys.argv[1] == "-a" ):
-      mcl,mpl,chc,phc = y.Ancestor("docker image ls")
-      print("The total Child Image count is {}".format(chc))
-      print("The total Parent Image count is {}".format(phc))
-    elif (sys.argv[1] == "-d" ):
-      y.Dangle()
-    elif (sys.argv[1] == "-p" ):
-      y.ImageArray()
-    elif (sys.argv[1] == "-f" ):
-      if (sys.argv[2]):
-        sh = sys.argv[2]
-        y.Findsha(sh)
-      else:
-        print("need an sha256 string")
-    else:
-      print("Allowed options are -a/-d/-p/-f")
-  else:
-    print("No comamnd line")
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
