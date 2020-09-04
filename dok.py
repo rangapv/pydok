@@ -184,18 +184,37 @@ class Prin(object):
       if line != '':
         os.write(1, line)
       else:
-        break 
+        break
+
+class Action1(argparse.Action):
+     def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+             raise ValueError("nargs not allowed")
+        super(Action1, self).__init__(option_strings, dest, **kwargs)
+     def __call__(self, parser, namespace, values, option_string=None):
+         print('%r %r %r' % (namespace, values, option_string))
+         t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+         l = []
+         for line in t1.stdout.splitlines():
+           r = re.findall(r'\S+',line)
+           l.append(r[0])
+#         return(l)
+         values = l
+         setattr(namespace, self.dest, values)
+
+ 
 
 if __name__ == '__main__':
   y = Prin()
 
   parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
-  parser.add_argument('-id', type=y.Dangle1) 
-  parser.add_argument('-cid', type=y.Containerid1)
-  parser.add_argument('-d', type=y.Dangle)
-  parser.add_argument('-p', type=y.ImageArray)
-  parser.add_argument('-a', type=y.Ancestor)
-  parser.add_argument('-f', type=y.Findsha)
+  parser.add_argument('-id', nargs='?', type=y.Dangle1) 
+  parser.add_argument('-cid', nargs='?', type=y.Containerid1)
+  parser.add_argument('-d', nargs='?', type=y.Dangle)
+  parser.add_argument('-p', nargs='?', type=y.ImageArray)
+  parser.add_argument('-a', nargs='?', type=y.Ancestor)
+  parser.add_argument('-f', nargs='?', type=y.Findsha)
+  parser.add_argument('-r', action=Action1)
   args = parser.parse_args()
   print(args)
 
