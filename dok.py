@@ -191,8 +191,19 @@ class Action1(argparse.Action):
         if nargs is not None:
              raise ValueError("nargs not allowed")
         super(Action1, self).__init__(option_strings, dest, **kwargs)
+
      def __call__(self, parser, namespace, values, option_string=None):
          print('%r %r %r' % (namespace, values, option_string))
+         setattr(namespace, self.dest, values)
+     
+     def __len__(self, parser, namespace, values, option_string=None):
+         print("inside len")
+         #print('%r %r %r' % (namespace, values, option_string))
+         setattr(namespace, self.dest, values)
+         #return values 
+
+     def __call1__(**kwargs):
+         #print('%r %r %r %r' % (namespace, values, self.dest, option_string))
          t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
          l = []
          for line in t1.stdout.splitlines():
@@ -200,13 +211,50 @@ class Action1(argparse.Action):
            l.append(r[0])
 #         return(l)
          values = l
-         setattr(namespace, self.dest, values)
+         print (values)
+         #setattr(namespace, self.dest, values)
+         return values 
+#     @classmethod 
+     def Method1(func):
+         g = "docker container ls"
+         t1 = subprocess.run(g, capture_output=True, shell=True, text=True, check=True)
+         l = []
+         for line in t1.stdout.splitlines():
+           r = re.findall(r'\S+',line)
+           l.append(r[0])
+#         return(l)
+         values = l
+         print(values)  
+
+     def Findsha(a,sh):
+      scount = 0
+      id = y.Imageid()
+      for ip in id:
+        pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)
+        pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
+        l21 = pl.stdout
+        l24 = l21.replace("[","")
+        l25 = l24.replace("]","")
+        s = re.findall(r'\S+', l25)
+        for g in s:
+          g1 = sh.find(g)
+          if (g1 != -1):
+            print("The sha id: {} is having Guardian: {}".format(sh,ip))
+            scount = scount + 1
+        print("Total Count:" + str(scount))
+
+
+     @Method1
+     def findsh():
+      print("hello")
+
 
  
 
 if __name__ == '__main__':
   y = Prin()
-
+  
+  c = Action1
   parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
   parser.add_argument('-id', nargs='?', type=y.Dangle1) 
   parser.add_argument('-cid', nargs='?', type=y.Containerid1)
@@ -214,8 +262,12 @@ if __name__ == '__main__':
   parser.add_argument('-p', nargs='?', type=y.ImageArray)
   parser.add_argument('-a', nargs='?', type=y.Ancestor)
   parser.add_argument('-f', nargs='?', type=y.Findsha)
-  parser.add_argument('-r', action=Action1)
+  parser.add_argument('-r', action=c)
+  parser.add_argument('-s', action=c)
+  parser.add_argument('-v', action=c.findsh)
+
+#  parser.add_argument('-s', action=Action1.Method1)
   args = parser.parse_args()
-  print(args)
+#  print(args)
 
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
