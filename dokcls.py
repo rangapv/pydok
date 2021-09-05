@@ -303,12 +303,13 @@ class Action1(argparse.Action):
          print("inside call1")
          t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
          l = []
-         for line in t1.stdout.splitlines():
-           r = re.findall(r'\S+',line)
-           l.append(r[0])
-#         return(l)
-         values = l
-         print (values)
+         print("ContainerID::::Up-Time::::Name")
+         for line in t1.stdout.splitlines()[1:]:
+          r = re.findall(r'\S\S\S',line)
+          s = re.split(r"\s{3,}",line)
+          print(s[0],"::", s[4],"::", s[5])
+          l.append(r[0])
+          values = l
          #setattr(namespace, self.dest, values)
          return values
 
