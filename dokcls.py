@@ -121,11 +121,14 @@ class Imageid(argparse.Action):
 
   def __call__(self, parser, namespace, values, option_string=None):
   #def Imageid(self):
+    print('%r %r %r %r' % (namespace, values, option_string, parser))
+    print("inside Imageid") 
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
     l = []
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line)
       l.append(r[2])
+    print("li " , l)  
     return(l)
 
 class ImageRepo(argparse.Action):
@@ -158,8 +161,11 @@ class Findsha(argparse.Action):
 
   def __call__(self, parser, namespace, values, option_string=None):
   #def Findsha(a,sh):
+    print('%r %r %r %r' % (namespace, values, option_string, parser))
+    print("inside Findsha") 
     scount = 0
-    id = y.Imageid()
+    id = Imageid(self,dest=values)
+    print("id ", id)
     for ip in id:
       pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)
       pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
@@ -170,7 +176,7 @@ class Findsha(argparse.Action):
       for g in s:
         g1 = sh.find(g)
         if (g1 != -1):
-          print("The sha id: {} is having Guardian: {}".format(sh,ip))
+          print("The sha id: {} is having Guardian: {}".format(values,ip))
           scount = scount + 1
     print("Total Count:" + str(scount))  
 
@@ -332,8 +338,10 @@ class Action1(argparse.Action):
          print (values)
          #setattr(namespace, self.dest, values)
          return values 
-#     @Action1 
-     def Method1(option_strings, dest, nargs=None, **kwargs):
+#     @staticmethod
+     def Method1():
+     #def Method1(self, option_strings, dest, nargs=None, **kwargs):
+   #  def Method1(self, dest, option_strings):
          g = "docker container ls"
          t1 = subprocess.run(g, capture_output=True, shell=True, text=True, check=True)
          l = []
@@ -343,7 +351,7 @@ class Action1(argparse.Action):
 #         return(l)
          values = l
          print(values) 
-         setattr(namespace, self.dest, values)
+    #     setattr(namespace, self.dest, values)
 
      def Findsha(a,sh):
       scount = 0
@@ -364,6 +372,24 @@ class Action1(argparse.Action):
      def findsh():
         print("Hello from findsh")
 
+
+     def Containercheck():
+        #def ContainerCheck(self,x):
+        count = 0
+        t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
+        for line in t1.stdout.splitlines():
+          r = re.findall(r'\S+',line)
+          r1 = re.search(r[1],x[0])
+          r2 = re.search(r[1],x[1])
+          if (r1 or r2):
+            count = count + 1
+        if (count == 0):
+            print("The iamge with ID: {}".format(x[0]) +  "is dangling")
+        else:
+            print("The iamge with ID: {}".format(x[0]) + " is in use")
+        return(count)
+
+
 #@Action1
 #def findsh1(self, dest=v):
 #    print("hello")
@@ -383,7 +409,9 @@ if __name__ == '__main__':
   parser.add_argument('-a', action=Ancestor)
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
-#  parser.add_argument('-r', action=c)
+  parser.add_argument('-i', action=Imageid)
+  parser.add_argument('-r', action=Action1.Method1())
+  parser.add_argument('-c', action=Action1.Containercheck())
 #  parser.add_argument('-v', action=findsh1)
 
 #  parser.add_argument('-s', action=Action1.Method1)
