@@ -111,17 +111,11 @@ class ImageArray(argparse.Action):
     print("Total found parent is {}".format(count))      
 
 
-class Imageid(argparse.Action):
+class Imageid:
 
-  def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         if nargs is not None:
-             raise ValueError("nargs not allowed")
-         super(Imageid, self).__init__(option_strings, dest, **kwargs)
-
-
-  def __call__(self, parser, namespace, values, option_string=None):
+  def __call__(self):
   #def Imageid(self):
-    print('%r %r %r %r' % (namespace, values, option_string, parser))
+  #  print('%r %r %r %r' % (namespace, values, option_string, parser))
     print("inside Imageid") 
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
     l = []
@@ -131,15 +125,9 @@ class Imageid(argparse.Action):
     print("li " , l)  
     return(l)
 
-class ImageRepo(argparse.Action):
+class ImageRepo:
 
-  def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         if nargs is not None:
-             raise ValueError("nargs not allowed")
-         super(ImageRepo, self).__init__(option_strings, dest, **kwargs)
-
-
-  def __call__(self, parser, namespace, values, option_string=None):
+  def __call__(self):
   #def ImageRepo(self):
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
     l = [] 
@@ -148,6 +136,7 @@ class ImageRepo(argparse.Action):
       r = re.findall(r'\S+',line)
       t = (r[2],r[0]) 
       l.append(t)
+    print("Imagerepo is ", l)
     return(l)
 
 
@@ -164,7 +153,7 @@ class Findsha(argparse.Action):
     print('%r %r %r %r' % (namespace, values, option_string, parser))
     print("inside Findsha") 
     scount = 0
-    id = Imageid(self,dest=values)
+    id = Imageid.__call__(self)
     print("id ", id)
     for ip in id:
       pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)
@@ -174,7 +163,7 @@ class Findsha(argparse.Action):
       l25 = l24.replace("]","")
       s = re.findall(r'\S+', l25)
       for g in s:
-        g1 = sh.find(g)
+        g1 = values.find(g)
         if (g1 != -1):
           print("The sha id: {} is having Guardian: {}".format(values,ip))
           scount = scount + 1
@@ -214,14 +203,12 @@ class Containerdid1(argparse.Action):
       l.append(r[0])
     return(l)
 
-class ContainerCheck(argparse.Action):
+class ContainerCheck:
 
-  def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         if nargs is not None:
-             raise ValueError("nargs not allowed")
-         super(ContainerCheck, self).__init__(option_strings, dest, **kwargs)
+  def __init__(self, x):
+       self.x = x
 
-  def __call__(self, parser, namespace, values, option_string=None):
+  def __call__(self, x):
   #def ContainerCheck(self,x):
     count = 0
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
@@ -232,9 +219,9 @@ class ContainerCheck(argparse.Action):
       if (r1 or r2):
        count = count + 1
     if (count == 0):
-      print("The iamge with ID: {}".format(x[0]) +  "is dangling")
+        print("The iamge with ID: {}".format(x[0]) +  "is dangling")
     else:
-      print("The iamge with ID: {}".format(x[0]) + " is in use")
+        print("The iamge with ID: {}".format(x[0]) + " is in use")
     return(count)
 
 
@@ -265,13 +252,13 @@ class Dangle(argparse.Action):
 
   def __call__(self, parser, namespace, values, option_string=None):
   #def Dangle(self):
-    li = self.Imageid()
+    li = Imageid.__call__(self)
    
-    l = self.ImageRepo()
+    l = ImageRepo.__call__(self)
     di = 0
     si = 0
     for x in l:
-      cc = self.ContainerCheck(x)
+      cc = ContainerCheck.__call__(self,x)
       if (cc == 0):
         di = di + 1
       else:
@@ -340,6 +327,7 @@ class Action1(argparse.Action):
          return values 
 #     @staticmethod
      def Method1():
+         print("Inside Method1")
      #def Method1(self, option_strings, dest, nargs=None, **kwargs):
    #  def Method1(self, dest, option_strings):
          g = "docker container ls"
@@ -353,46 +341,6 @@ class Action1(argparse.Action):
          print(values) 
     #     setattr(namespace, self.dest, values)
 
-     def Findsha(a,sh):
-      scount = 0
-      id = y.Imageid()
-      for ip in id:
-        pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(ip)
-        pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
-        l21 = pl.stdout
-        l24 = l21.replace("[","")
-        l25 = l24.replace("]","")
-        s = re.findall(r'\S+', l25)
-        for g in s:
-          g1 = sh.find(g)
-          if (g1 != -1):
-            print("The sha id: {} is having Guardian: {}".format(sh,ip))
-            scount = scount + 1
-        print("Total Count:" + str(scount))
-     def findsh():
-        print("Hello from findsh")
-
-
-     def Containercheck():
-        #def ContainerCheck(self,x):
-        count = 0
-        t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
-        for line in t1.stdout.splitlines():
-          r = re.findall(r'\S+',line)
-          r1 = re.search(r[1],x[0])
-          r2 = re.search(r[1],x[1])
-          if (r1 or r2):
-            count = count + 1
-        if (count == 0):
-            print("The iamge with ID: {}".format(x[0]) +  "is dangling")
-        else:
-            print("The iamge with ID: {}".format(x[0]) + " is in use")
-        return(count)
-
-
-#@Action1
-#def findsh1(self, dest=v):
-#    print("hello")
 
 #class Action2():
 #   @Action1(argparse.Action)
@@ -400,7 +348,8 @@ class Action1(argparse.Action):
 #       print("hello")
 
 if __name__ == '__main__':
-  y = Prin()
+#  y = Prin()
+  q = Action1
   parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
   parser.add_argument('-id', action=Dangle1) 
   parser.add_argument('-cid', action=Containerdid1)
@@ -409,9 +358,10 @@ if __name__ == '__main__':
   parser.add_argument('-a', action=Ancestor)
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
-  parser.add_argument('-i', action=Imageid)
-  parser.add_argument('-r', action=Action1.Method1())
-  parser.add_argument('-c', action=Action1.Containercheck())
+#  parser.add_argument('-i', action=Imageid)
+  parser.add_argument('-r', action=q.Method1())
+  parser.add_argument('-s', action=Action1)
+#  parser.add_argument('-c', action=Action1.Containercheck())
 #  parser.add_argument('-v', action=findsh1)
 
 #  parser.add_argument('-s', action=Action1.Method1)
