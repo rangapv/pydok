@@ -7,6 +7,7 @@ import sys
 import io
 import re
 import argparse
+import shutil
 
 from subprocess import PIPE
 
@@ -281,6 +282,19 @@ class New3(argparse.Action):
       else:
         break
 
+class Filecopy(argparse.Action):
+      def __init__(self, option_strings, dest, nargs=None, **kwargs):
+         if nargs is not None:
+             raise ValueError("nargs not allowed")
+         super(Filecopy, self).__init__(option_strings, dest, **kwargs) 
+    
+    
+      def __call__(self, parser, namespace, values, option_string=None):
+          print('%r %r %r %r' % (namespace, values, option_string, parser))
+          print("values" , values.name)
+          print("name", namespace.ff.name)
+          shutil.copyfile(namespace.ff.name,values.name)
+
 class Action1(argparse.Action):
 
      def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -289,7 +303,7 @@ class Action1(argparse.Action):
          super(Action1, self).__init__(option_strings, dest, **kwargs)
 
      def __call__(self, parser, namespace, values, option_string=None):
-         #print('%r %r %r %r' % (namespace, values, option_string, parser))
+         print('%r %r %r %r' % (namespace, values, option_string, parser))
          t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
          l = []
          print("ContainerID::::Up-Time::::Name")
@@ -359,7 +373,8 @@ if __name__ == '__main__':
   parser.add_argument('-s', action=Action1)
 #  parser.add_argument('-c', action=Action1.Containercheck())
 #  parser.add_argument('-v', action=findsh1)
-
+  parser.add_argument('-ff', type=argparse.FileType('r'))
+  parser.add_argument('-df', type=argparse.FileType('w'), action=Filecopy)
 #  parser.add_argument('-s', action=Action1.Method1)
   args = parser.parse_args()
 #  print(args)
