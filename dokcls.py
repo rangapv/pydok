@@ -254,14 +254,14 @@ class Dangle(argparse.Action):
     l = ImageRepo.__call__(self)
     di = 0
     si = 0
-    for x in l:
+    for x in l[1:]:
       cc = ContainerCheck.__call__(self,x)
       if (cc == 0):
         di = di + 1
       else:
         si = si + 1
     print("The totat Dangling Image count is {} ".format(di))
-    print("The total Iamge in use by container is {} ".format(si))
+    print("The total Image in use by container is {} ".format(si))
 
 class New3(argparse.Action):
 
@@ -289,8 +289,7 @@ class Action1(argparse.Action):
          super(Action1, self).__init__(option_strings, dest, **kwargs)
 
      def __call__(self, parser, namespace, values, option_string=None):
-         print('%r %r %r %r' % (namespace, values, option_string, parser))
-         print("inside call1")
+         #print('%r %r %r %r' % (namespace, values, option_string, parser))
          t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
          l = []
          print("ContainerID::::Up-Time::::Name")
@@ -347,7 +346,7 @@ class Action1(argparse.Action):
 if __name__ == '__main__':
 #  y = Prin()
   q = Action1
-  parser = argparse.ArgumentParser(description='A python code to display Docker stats', epilog='Hope you like this program')
+  parser = argparse.ArgumentParser(description='A python code to display Docker stats', fromfile_prefix_chars='@', epilog='Hope you like this program')
   parser.add_argument('-id', action=Dangle1) 
   parser.add_argument('-cid', action=Containerdid1)
   parser.add_argument('-z',  action=Dangle)
