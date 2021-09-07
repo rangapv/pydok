@@ -114,21 +114,18 @@ class ImageArray(argparse.Action):
 class Imageid:
 
   def __call__(self):
-  #def Imageid(self):
-  #  print('%r %r %r %r' % (namespace, values, option_string, parser))
-    print("inside Imageid") 
+    #print("inside Imageid") 
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
     l = []
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line)
       l.append(r[2])
-    print("li " , l)  
+    #print("li " , l)  
     return(l)
 
 class ImageRepo:
 
   def __call__(self):
-  #def ImageRepo(self):
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
     l = [] 
     t = ()
@@ -136,7 +133,7 @@ class ImageRepo:
       r = re.findall(r'\S+',line)
       t = (r[2],r[0]) 
       l.append(t)
-    print("Imagerepo is ", l)
+    #print("Imagerepo is ", l)
     return(l)
 
 
@@ -359,7 +356,7 @@ if __name__ == '__main__':
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
 #  parser.add_argument('-i', action=Imageid)
-  parser.add_argument('-r', action=q.Method1())
+#  parser.add_argument('-r', action=q.Method1())
   parser.add_argument('-s', action=Action1)
 #  parser.add_argument('-c', action=Action1.Containercheck())
 #  parser.add_argument('-v', action=findsh1)
