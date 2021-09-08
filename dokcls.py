@@ -295,9 +295,22 @@ class Filecopy(argparse.Action):
           print("name", namespace.ff.name)
           shutil.copyfile(namespace.ff.name,values.name)
 
+
+
+class Action2:
+
+     def __init__(self,f):
+         self.f = f
+
+     def __call__(self,a):
+         print("as is ")
+         return self.f 
+    #     self.function(self, option_strings, dest, nargs=None, **kwargs)
+
 class Action1(argparse.Action):
 
      def __init__(self, option_strings, dest, nargs=None, **kwargs):
+         print("inside action1")
          if nargs is not None:
              raise ValueError("nargs not allowed")
          super(Action1, self).__init__(option_strings, dest, **kwargs)
@@ -353,9 +366,9 @@ class Action1(argparse.Action):
 
 
 #class Action2():
-#   @Action1(argparse.Action)
-#   def findsh1():
-#       print("hello")
+@Action2(argparse.Action)
+def findsh4(self):
+     print("hello")
 
 if __name__ == '__main__':
 #  y = Prin()
@@ -368,7 +381,7 @@ if __name__ == '__main__':
   parser.add_argument('-a', action=Ancestor)
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
-#  parser.add_argument('-i', action=Imageid)
+  parser.add_argument('-i', action=findsh4)
 #  parser.add_argument('-r', action=q.Method1())
   parser.add_argument('-s', action=Action1)
 #  parser.add_argument('-c', action=Action1.Containercheck())
