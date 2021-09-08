@@ -124,6 +124,7 @@ class Imageid:
     #print("li " , l)  
     return(l)
 
+
 class ImageRepo:
 
   def __call__(self):
@@ -203,11 +204,9 @@ class Containerdid1(argparse.Action):
 
 class ContainerCheck:
 
-  def __init__(self, x):
-       self.x = x
-
-  def __call__(self, x):
+  def __call__(self,x):
   #def ContainerCheck(self,x):
+    #print("Inside container call") 
     count = 0
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
     for line in t1.stdout.splitlines():
@@ -256,7 +255,8 @@ class Dangle(argparse.Action):
     di = 0
     si = 0
     for x in l[1:]:
-      cc = ContainerCheck.__call__(self,x)
+      cd = ContainerCheck()
+      cc = cd(x)
       if (cc == 0):
         di = di + 1
       else:
