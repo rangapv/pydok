@@ -39,30 +39,24 @@ class New2(argparse.Action):
        print ("the command failed :" + str(t1))
       return t1.returncode
 
-class Ancestor(argparse.Action):
+class Ancestor:
 
-     def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         if nargs is not None:
-             raise ValueError("nargs not allowed")
-         super(Ancestor, self).__init__(option_strings, dest, **kwargs)
-
-
-     def __call__(self, parser, namespace, values, option_string=None):
+     def __call__(self, b):
      #def Ancestor(a,b):
         t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
         cl = []
         pl = []
         cc = 0
         pc = 0
-        for line in t1.stdout.splitlines():
+        for line in t1.stdout.splitlines()[1:]:
            r = re.findall(r'\S+',line) 
            pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=False)
            if (len(pa.stdout) > 1 ):
-             print ("Image with ID:"+  r[2] + "is a CHILD")
+             print ("Image with ID:"+  r[2] + " is a CHILD")
              cl.append(r[2])
              cc = cc + 1
            else:
-             print ("Image with ID:"+  r[2] + "is a PARENT")
+             print ("Image with ID:"+  r[2] + " is a PARENT")
              pl.append(r[2])
              pc = pc + 1 
         return(cl,pl,cc,pc)
@@ -77,15 +71,18 @@ class ImageArray(argparse.Action):
   def __call__(self, parser, namespace, values, option_string=None):
   #def ImageArray(a,string):
     b = "docker image ls"
-    icl,ipl,icc,ipc = y.Ancestor(b)
+    icl,ipl,icc,ipc = Ancestor.__call__(self, b)
+    print("Parent list of images is ", ipl)
+    print("Child list of images is ", icl)
+    print("Parent count is ", ipc)
+    print("Child count is ", icc)
     count = 0
-    print(icl)
+    chcount = 0 
     icl = list(dict.fromkeys(icl))
-    print(icl)
-    print(ipl)
     for x in icl:
       c = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(x)
       t1 = subprocess.run(c, capture_output=True, shell=True, text=True, check=True)
+      print("inside for x loop", c)
     #  for line in t1.stdout.splitlines():
       r = re.findall(r'\S+', t1.stdout)
       cv = 0
@@ -108,8 +105,11 @@ class ImageArray(argparse.Action):
                 if (g1 != -1): 
                   print("The image child id: {} is having Guardian: {}".format(x,ip))
                   count = count + 1
-                  cv = 1  
-    print("Total found parent is {}".format(count))      
+                  cv = 1 
+                else:
+                  chcount += 1
+    print("Total found parent with child is {}".format(count))      
+    print("Total found Children with parent is {}".format(chcount))      
 
 
 class Imageid:
@@ -303,14 +303,14 @@ class Action2:
          self.f = f
 
      def __call__(self,a):
-         print("as is ")
+      #   print("as is ")
          return self.f 
     #     self.function(self, option_strings, dest, nargs=None, **kwargs)
 
 class Action1(argparse.Action):
 
      def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         print("inside action1")
+         #print("inside action1")
          if nargs is not None:
              raise ValueError("nargs not allowed")
          super(Action1, self).__init__(option_strings, dest, **kwargs)
@@ -378,7 +378,7 @@ if __name__ == '__main__':
   parser.add_argument('-cid', action=Containerdid1)
   parser.add_argument('-z',  action=Dangle)
   parser.add_argument('-p', action=ImageArray)
-  parser.add_argument('-a', action=Ancestor)
+#  parser.add_argument('-a', action=Ancestor)
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
   parser.add_argument('-i', action=findsh4)
