@@ -390,6 +390,6 @@ if __name__ == '__main__':
   parser.add_argument('-df', type=argparse.FileType('w'), action=Filecopy)
 #  parser.add_argument('-s', action=Action1.Method1)
   args = parser.parse_args()
-#  print(args)
+  print(args)
 
 #for 3.5  tg = subprocess.run(['docker', 'image', 'ls'], stdout=PIPE, stderr=PIPE)
