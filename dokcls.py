@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import subprocess
@@ -39,26 +39,34 @@ class New2(argparse.Action):
        print ("the command failed :" + str(t1))
       return t1.returncode
 
-class Ancestor:
+class Ancestor(argparse.Action):
 
-     def __call__(self, b):
+     def __init__(self, option_strings, dest, nargs=None, **kwargs):
+           if nargs is not None:
+               raise ValueError("nargs not allowed")
+           super(Ancestor, self).__init__(option_strings, dest, **kwargs)
+
+     def __call__(self, parser, namespace, values, option_string=None):
      #def Ancestor(a,b):
-        t1 = subprocess.run(b, capture_output=True, shell=True, text=True, check=True)
+        t1 = subprocess.run("docker ps", capture_output=True, shell=True, text=True, check=True)
         cl = []
         pl = []
         cc = 0
         pc = 0
-        for line in t1.stdout.splitlines()[1:]:
+        for line in t1.stdout.splitlines()[0:]:
            r = re.findall(r'\S+',line) 
-           pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=False)
+           print(" r is " )
+           print( r)
+           pa = subprocess.run("docker inspect --format='{{{{.Parent}}}}' {}".format(r[0]), capture_output=True, shell=True, text=True, check=False)
            if (len(pa.stdout) > 1 ):
-             print ("Image with ID:"+  r[2] + " is a CHILD")
+             print ("Image with ID:"+  r[1] + " is a CHILD")
              cl.append(r[2])
              cc = cc + 1
            else:
-             print ("Image with ID:"+  r[2] + " is a PARENT")
+             print ("Image with ID:"+  r[1] + " is a PARENT")
              pl.append(r[2])
-             pc = pc + 1 
+             pc = pc + 1
+        setattr(namespace,self.dest,values) 
         return(cl,pl,cc,pc)
 
 class ImageArray(argparse.Action):
@@ -231,13 +239,14 @@ class Dangle1(argparse.Action):
 
   def __call__(self, parser, namespace, values, option_string=None):
   #def Dangle1(a,string):
-    value = int(string)
 
     t1 = subprocess.run("docker container ls", capture_output=True, shell=True, text=True, check=True)
     l = []
     for line in t1.stdout.splitlines():
       r = re.findall(r'\S+',line)
       l.append(r[0])
+    values=l
+    setattr(namespace,self.dest,values)
     return(l)
 
 class Dangle(argparse.Action):
@@ -326,7 +335,7 @@ class Action1(argparse.Action):
           print(s[0],"::", s[4],"::", s[5])
           l.append(r[0])
           values = l
-         #setattr(namespace, self.dest, values)
+         setattr(namespace, self.dest, values)
          return values
 
      def __len__(self, parser, namespace, values, option_string=None):
@@ -378,7 +387,7 @@ if __name__ == '__main__':
   parser.add_argument('-cid', action=Containerdid1)
   parser.add_argument('-z',  action=Dangle)
   parser.add_argument('-p', action=ImageArray)
-#  parser.add_argument('-a', action=Ancestor)
+  parser.add_argument('-a', action=Ancestor)
   parser.add_argument('-f', action=Findsha)
   parser.add_argument('-t', action=Action1)
   parser.add_argument('-i', action=findsh4)
