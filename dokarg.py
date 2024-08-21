@@ -54,29 +54,70 @@ class Imagelist(argparse.Action):
          super(Imagelist, self).__init__(option_strings, dest, **kwargs)
 
    def __call__(self, parser, namespace, values, option_string=None):
+ 
+     c1 = subprocess.run("docker container ps", capture_output=True, shell=True, text=True, check=True)
+     cl = {}
+     for line in c1.stdout.splitlines():
+       r = re.findall(r'\S+',line)
+       if (r[0] != "CONTAINER"):
+         c2 = subprocess.run("docker inspect --format='{{{{.Config.Image}}}}' {}".format(r[0]), capture_output=True, shell=True, text=True, check=True)
+         #print(t2)
+         if ((c2.stdout) == "\n"):
+          c2.stdout = "Error"
+          inc = inc+1
+         c3 = c2.stdout
+         cl[c3.rstrip()] = (r[0]) 
+         #cl[(r[0])] = c3.rstrip() 
+     #print(cl)
+
      t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
-     l = []
+     l = {}
+     inc = 0
      for line in t1.stdout.splitlines():
        r = re.findall(r'\S+',line)
-       l.append(r[2])
-     #print("li " , l)
-     values=l
+       if (r[2] != "IMAGE"):
+        t2 = subprocess.run("docker inspect --format='{{{{.RepoTags}}}}' {}".format(r[2]), capture_output=True, shell=True, text=True, check=True) 
+        #print(t2)
+        if ((t2.stdout) == "\n"):
+         t2.stdout = "NO-CONTAINER use this Image"
+         inc = inc+1
+        t3 = t2.stdout
+        l[t3.rstrip()] = (r[2])
+        #l[(r[2])] = t3.rstrip()
+         #print("li " , l)
+        temp = t3.rstrip()
+        temp1 = str(temp)[1:-1]
+        #print ("temp is " + temp1)
+        if temp1 in cl:
+          print(f'Image: {temp1} with ID {r[2]} is used by the container {cl[temp1]}')
+        else:
+          print(f'Image: {temp1} with ID {r[2]} is NOT used by any container')
+
+     values=l,inc
+    # print(l)
      setattr(namespace, self.dest, values)
 
-class ImageRepo(argparse.Action):
+class Containerlist(argparse.Action):
    def __init__(self, option_strings, dest, nargs=None, **kwargs):
          if nargs is not None:
              raise ValueError("nargs not allowed")
-         super(ImageRepo, self).__init__(option_strings, dest, **kwargs)
+         super(Containerlist, self).__init__(option_strings, dest, **kwargs)
 
    def __call__(self, parser, namespace, values, option_string=None):
-     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
-     l = []
+     t1 = subprocess.run("docker container ps", capture_output=True, shell=True, text=True, check=True)
+     l = {}
      t = ()
      for line in t1.stdout.splitlines():
-      r = re.findall(r'\S+',line)
-      t = (r[2],r[0])
-      l.append(t)
+       r = re.findall(r'\S+',line)
+       if (r[0] != "CONTAINER"):
+         t2 = subprocess.run("docker inspect --format='{{{{.Config.Image}}}}' {}".format(r[0]), capture_output=True, shell=True, text=True, check=True)
+         #print(t2)
+         if ((t2.stdout) == "\n"):
+          t2.stdout = "Error"
+          inc = inc+1
+         t3 = t2.stdout      
+         l[(r[0])] = t3.rstrip()
+
      values=l
      setattr(namespace, self.dest, values)
 
@@ -88,8 +129,8 @@ if __name__ == '__main__':
   parser.add_argument('-s', type=findsh4)
   parser.add_argument('-ld', action=docklist, help='to display the list of containers running')
   parser.add_argument('-il', action=Imagelist, help='to display the list of container iamges in this box')
-  parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
- 
+  #parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
+  parser.add_argument('-cl', action=Containerlist, help='to display the list of containers in this box')
   args = parser.parse_args()
 
   print(args) 
