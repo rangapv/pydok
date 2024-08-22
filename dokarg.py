@@ -31,6 +31,26 @@ def findsh4(self):
     values=5
     return values
 
+
+def count1(self):
+    t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
+    contlen = t1.stdout
+    #print(contlen)
+    len1 = len(contlen.splitlines())
+    print("**********************")
+    print(f'total images are {len1-1}')
+  #  t1 = subprocess.run("docker xxximage ls", capture_output=True, shell=True, text=True, check=True)
+
+def count2(self):
+    t1 = subprocess.run("docker container ps", capture_output=True, shell=True, text=True, check=True)
+    contlen = t1.stdout
+    #print(contlen)
+    len1 = len(contlen.splitlines())
+    print("**********************")
+    print(f'total containers are {len1-1}')
+    print("***********************")
+
+
 class docklist(argparse.Action):
    def __init__(self, option_strings, dest, nargs=None, **kwargs):
          if nargs is not None:
@@ -73,6 +93,8 @@ class Imagelist(argparse.Action):
      t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
      l = {}
      inc = 0
+     print("**********************")
+     print("Dangling Images") 
      for line in t1.stdout.splitlines():
        r = re.findall(r'\S+',line)
        if (r[2] != "IMAGE"):
@@ -107,6 +129,7 @@ class Containerlist(argparse.Action):
      t1 = subprocess.run("docker container ps", capture_output=True, shell=True, text=True, check=True)
      l = {}
      t = ()
+     print("***********************")
      for line in t1.stdout.splitlines():
        r = re.findall(r'\S+',line)
        if (r[0] != "CONTAINER"):
@@ -119,6 +142,8 @@ class Containerlist(argparse.Action):
          l[(r[0])] = t3.rstrip()
 
      values=l
+     print("The list of Containers running in the box and its repo-tag..")
+     print(values)
      setattr(namespace, self.dest, values)
 
 
@@ -127,10 +152,18 @@ if __name__ == '__main__':
   parser.add_argument('-id', action=Dangle1) 
   
   parser.add_argument('-s', type=findsh4)
+  parser.add_argument('-image', type=count1, help='to display the total images in the box')
+  parser.add_argument('-tainer', type=count2, help='to display the total containers in the box')
   parser.add_argument('-ld', action=docklist, help='to display the list of containers running')
-  parser.add_argument('-il', action=Imagelist, help='to display the list of container iamges in this box')
+  parser.add_argument('-il', action=Imagelist, help='to display the list of Dangling images in the box')
   #parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
   parser.add_argument('-cl', action=Containerlist, help='to display the list of containers in this box')
   args = parser.parse_args()
+#  tr = parser.parse_args()._get_kwargs() 
+#  print(args)
+#  print("print tr") 
+#  print(tr)
 
-  print(args) 
+#  for _, value in parser.parse_args()._get_kwargs():
+#    if value is not None:
+#        print(value)
