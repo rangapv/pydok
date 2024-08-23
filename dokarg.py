@@ -12,25 +12,6 @@ import shutil
 
 from subprocess import PIPE
 
-class Dangle1(argparse.Action):
-  def __init__(self, option_strings, dest, nargs=None, **kwargs):
-         if nargs is not None:
-             raise ValueError("nargs not allowed")
-         super(Dangle1, self).__init__(option_strings, dest, **kwargs)
-
-  def __call__(self, parser, namespace, values, option_string=None):
-    t1 = subprocess.run("ls -l", capture_output=True, shell=True, text=True, check=True)
-    l = []
-    count = 0
-    dest=t1
-    values=t1
-    setattr(namespace, self.dest, values)
-
-#@Action2(argparse.Action)
-def findsh4(self):
-    values=5
-    return values
-
 
 def count1(self):
     t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
@@ -58,10 +39,13 @@ class docklist(argparse.Action):
          super(docklist, self).__init__(option_strings, dest, **kwargs)
 
    def __call__(self, parser, namespace, values, option_string=None):
-      t1 = subprocess.run("docker ps", capture_output=True, shell=True, text=True, check=True)
+      t1 = subprocess.run("docker stats --no-stream", capture_output=True, shell=True, text=True, check=True)
+      t2 = subprocess.run("docker -v", capture_output=True, shell=True, text=True, check=True)
+      t3 = subprocess.run("which docker", capture_output=True, shell=True, text=True, check=True)
       #print("returncode is" + str(t1.returncode))
       if ( t1.returncode == 0 ):
-       print ("the output is successful :" )
+       print ("the output is successful :" + t1.stdout )
+       print (f'the Docker version installed is \"{t2.stdout}\" and install directory is \"{t3.stdout}\"') 
       else:
        print ("the command failed :" + str(t1))
       values=t1
@@ -94,7 +78,7 @@ class Imagelist(argparse.Action):
      l = {}
      inc = 0
      print("**********************")
-     print("Dangling Images") 
+     print("Images in the box") 
      for line in t1.stdout.splitlines():
        r = re.findall(r'\S+',line)
        if (r[2] != "IMAGE"):
@@ -111,9 +95,9 @@ class Imagelist(argparse.Action):
         temp1 = str(temp)[1:-1]
         #print ("temp is " + temp1)
         if temp1 in cl:
-          print(f'Image: {temp1} with ID {r[2]} is used by the container {cl[temp1]}')
+          print(f'Image: \"{temp1}\" with ID \"{r[2]}\" is used by the container \"{cl[temp1]}\" ')
         else:
-          print(f'Image: {temp1} with ID {r[2]} is NOT used by any container')
+          print(f'Image: \"{temp1}\" with ID \"{r[2]}\" is NOT used by any container at the moment')
 
      values=l,inc
     # print(l)
@@ -149,13 +133,12 @@ class Containerlist(argparse.Action):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='A python code to display argparse capability', fromfile_prefix_chars='@', epilog='Hope you like this program')
-  parser.add_argument('-id', action=Dangle1) 
   
-  parser.add_argument('-s', type=findsh4)
-  parser.add_argument('-image', type=count1, help='to display the total images in the box')
-  parser.add_argument('-tainer', type=count2, help='to display the total containers in the box')
-  parser.add_argument('-ld', action=docklist, help='to display the list of containers running')
-  parser.add_argument('-il', action=Imagelist, help='to display the list of Dangling images in the box')
+  #parser.add_argument('-s', type=findsh4, help='to display the image sha4')
+  parser.add_argument('-img', type=count1, help='to display the total images in the box')
+  parser.add_argument('-ctan', type=count2, help='to display the total containers in the box')
+  parser.add_argument('-dstat', action=docklist, help='to display the list Docker deamon running')
+  parser.add_argument('-il', action=Imagelist, help='to display the list of images and if they are DANGLING')
   #parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
   parser.add_argument('-cl', action=Containerlist, help='to display the list of containers in this box')
   args = parser.parse_args()
