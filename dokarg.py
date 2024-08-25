@@ -132,12 +132,12 @@ class Containerlist(argparse.Action):
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='A python code to display argparse capability', fromfile_prefix_chars='@', epilog='Hope you like this program')
+  parser = argparse.ArgumentParser(description='A python code to display argparse capability', fromfile_prefix_chars='@', argument_default=argparse.SUPPRESS,  epilog='Hope you like this program')
   
   #parser.add_argument('-s', type=findsh4, help='to display the image sha4')
-  parser.add_argument('-img', type=count1, help='to display the total images in the box')
-  parser.add_argument('-ctan', type=count2, help='to display the total containers in the box')
-  parser.add_argument('-dstat', action=docklist, help='to display the list Docker deamon running')
+  parser.add_argument('-img', type=count1, nargs='?', const='c', help='to display the total images in the box')
+  parser.add_argument('-ctan', type=count2, nargs='?', const='c', help='to display the total containers in the box')
+  parser.add_argument('-dstat', action=docklist, const='c', help='to display the list Docker daemon running')
   parser.add_argument('-il', action=Imagelist, help='to display the list of images and if they are DANGLING')
   #parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
   parser.add_argument('-cl', action=Containerlist, help='to display the list of containers in this box')
