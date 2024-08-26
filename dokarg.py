@@ -31,6 +31,39 @@ def count2(self):
     print(f'total containers are {len1-1}')
     print("***********************")
 
+def Imageid(self):
+    t1 = subprocess.run("docker image ls", capture_output=True, shell=True, text=True, check=True)
+    l = []
+    for line in t1.stdout.splitlines():
+      r = re.findall(r'\S+',line)
+      l.append(r[2])
+    return(l)
+
+
+def Findsha(sha):
+    scount = 0
+    b = sha 
+    id = Imageid(b)
+    #for ip in id:
+    ip = id
+    if ( b in ip ):
+      print("*************************")
+      print("The sha layers for image id {} is :".format(b))
+      pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(b)
+      pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
+      l21 = pl.stdout
+      l24 = l21.replace("[","")
+      l25 = l24.replace("]","")
+      s = re.findall(r'\S+', l25)
+      print(s)
+      #for g in s:
+       # g1 = sh.find(g)
+        #if (g1 != -1):
+         # print("The sha id: {} is having Guardian: {}".format(sh,ip))
+          #scount = scount + 1
+    else:
+        print("The image with id {} is not present to print it's sha256 value".format(b))
+    #print("Total Count:" + str(scount)) 
 
 class docklist(argparse.Action):
    def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -137,7 +170,9 @@ if __name__ == '__main__':
   #parser.add_argument('-s', type=findsh4, help='to display the image sha4')
   parser.add_argument('-img', type=count1, nargs='?', const='c', help='to display the total images in the box')
   parser.add_argument('-ctan', type=count2, nargs='?', const='c', help='to display the total containers in the box')
-  parser.add_argument('-dstat', action=docklist, const='c', help='to display the list Docker daemon running')
+  parser.add_argument('-sha', type=Findsha, nargs=1, help='to display the sha layers for an image-id in the box')
+  #parser.add_argument('-sha', type=Findsha, nargs='1', const='c', help='to display the image sha in the box')
+  parser.add_argument('-dstat', action=docklist, const='l', help='to display the list Docker daemon running')
   parser.add_argument('-il', action=Imagelist, help='to display the list of images and if they are DANGLING')
   #parser.add_argument('-ir', action=ImageRepo, help='to display the list of container iamges repo details')
   parser.add_argument('-cl', action=Containerlist, help='to display the list of containers in this box')
