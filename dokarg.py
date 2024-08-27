@@ -48,14 +48,18 @@ def Findsha(sha):
     ip = id
     if ( b in ip ):
       print("*************************")
-      print("The sha layers for image id {} is :".format(b))
       pc = "docker inspect --format='{{{{.RootFS.Layers}}}}' {}".format(b)
       pl = subprocess.run(pc, capture_output=True, shell=True, text=True, check=False)
       l21 = pl.stdout
+      #print("l21 is {}".format(l21))
       l24 = l21.replace("[","")
+      #print("l24 is {}".format(l24))
       l25 = l24.replace("]","")
+      #l26 = l25.replace(" ","\n")
+      #print("l26 is {}".format(l26))
       s = re.findall(r'\S+', l25)
-      print(s)
+      print("The sha layers for image id \"{}\" is: {}".format(b,s))
+      print("The image with id \"{}\" has \"{}\" layers".format(b,len(s)))
       #for g in s:
        # g1 = sh.find(g)
         #if (g1 != -1):
